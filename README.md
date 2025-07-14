@@ -1,4 +1,4 @@
-# Cell_medial_axis_definitions
+# BimedialAxis
 This repository includes custom functions that can be used to draw the medial cell axis
 
 ## Bivariate_medial_axis_estimation:
