@@ -493,21 +493,22 @@ def get_oned_coordinates(cell_mask, medial_axis_df):
         min_arch = min_df.arch_length_centered.values[0]       # px
         min_scaled = min_df.arch_length_scaled.values[0]       # dimensionless
         min_dist_abs = min_df.pixel_distance.values[0]         # px
-        min_index = min_df.index.values[0]
+        min_index = int(min_df.index.values[0])
         axis_coords = (min_df.cropped_x.values[0], min_df.cropped_y.values[0])
 
         def get_relative_distance(min_distance_abs, medial_axis_df, min_index,
                                   medial_axis_coords, pixel_x, pixel_y):
             """Computes signed lateral distance using cross-product of tangent and pixel vectors."""
             half_window = 5
+            max_index = len(medial_axis_df) - 1  # ← FIX: Use len() instead of .index.max()
 
             # Select a local window around the nearest axis point to estimate the tangent
-            if min_index >= half_window and min_index < medial_axis_df.index.max() - half_window:
+            if min_index >= half_window and min_index < max_index - half_window:
                 idx_lo, idx_hi = min_index - half_window, min_index + half_window
             elif min_index < half_window:
-                idx_lo, idx_hi = 0, min_index + half_window
+                idx_lo, idx_hi = 0, min(min_index + half_window, max_index)  # ← Also add bounds check
             else:
-                idx_lo, idx_hi = min_index - half_window, medial_axis_df.index.max()
+                idx_lo, idx_hi = max(min_index - half_window, 0), max_index  # ← Add bounds check
 
             # Local tangent vector along the medial axis
             delta_x = medial_axis_df.iloc[idx_hi].cropped_x - medial_axis_df.iloc[idx_lo].cropped_x
